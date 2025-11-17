@@ -338,11 +338,29 @@ export class Game {
             this.ctx.save();
             this.ctx.lineWidth = 2;
             this.ctx.shadowBlur = 8;
-            this.ctx.shadowColor = 'rgba(255, 255, 100, 0.8)';
+            
             const alpha = (Math.sin(performance.now() / 250) + 1) / 2 * 0.6 + 0.4; // Pulsates between 0.4 and 1.0
             
+            const woodcuttingStates = [PLAYER_STATE.MOVING_TO_TREE, PLAYER_STATE.CHOPPING];
+            const gatheringStates = [
+                PLAYER_STATE.MOVING_TO_LOGS,
+                PLAYER_STATE.HARVESTING_LOGS,
+                PLAYER_STATE.MOVING_TO_BUSHES,
+                PLAYER_STATE.HARVESTING_BUSHES
+            ];
+
             for (const player of this.players.values()) {
-                if ((player.state === PLAYER_STATE.MOVING_TO_TREE || player.state === PLAYER_STATE.CHOPPING) && player.actionTarget) {
+                let indicatorColor = null;
+
+                if (woodcuttingStates.includes(player.state)) {
+                    this.ctx.shadowColor = 'rgba(255, 255, 100, 0.8)';
+                    indicatorColor = `rgba(255, 255, 100, ${alpha})`;
+                } else if (gatheringStates.includes(player.state)) {
+                    this.ctx.shadowColor = 'rgba(100, 220, 255, 0.8)';
+                    indicatorColor = `rgba(100, 220, 255, ${alpha})`;
+                }
+                
+                if (indicatorColor && player.actionTarget) {
                     const targetX = player.actionTarget.x;
                     const targetY = player.actionTarget.y;
 
@@ -353,7 +371,7 @@ export class Game {
                     if (screenX + tileSize > 0 && screenX < this.canvas.width &&
                         screenY + tileSize > 0 && screenY < this.canvas.height) {
 
-                        this.ctx.strokeStyle = `rgba(255, 255, 100, ${alpha})`;
+                        this.ctx.strokeStyle = indicatorColor;
                         this.ctx.strokeRect(screenX + 1, screenY + 1, tileSize - 2, tileSize - 2);
                     }
                 }
