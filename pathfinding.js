@@ -41,7 +41,10 @@ function findPath(startX, startY, endX, endY, map) {
                 continue;
             }
 
-            const tentativeGScore = gScore.get(current) + 1;
+            const dx = neighbor.x - currentX;
+            const dy = neighbor.y - currentY;
+            const distance = Math.sqrt(dx*dx + dy*dy); // 1 for cardinal, sqrt(2) for diagonal
+            const tentativeGScore = gScore.get(current) + distance;
 
             if (!openSet.has(neighborNode)) {
                 openSet.add(neighborNode);
@@ -69,6 +72,11 @@ function getNeighbors(x, y, map) {
         { dx: 0, dy: 1 },  // down
         { dx: -1, dy: 0 }, // left
         { dx: 1, dy: 0 },   // right
+        // Diagonals
+        { dx: -1, dy: -1 }, // up-left
+        { dx: 1, dy: -1 },  // up-right
+        { dx: -1, dy: 1 },  // down-left
+        { dx: 1, dy: 1 },   // down-right
     ];
 
     for (const dir of directions) {
@@ -76,7 +84,16 @@ function getNeighbors(x, y, map) {
         const newY = y + dir.dy;
 
         if (newX >= 0 && newX < map.width && newY >= 0 && newY < map.height && !map.isColliding(newX, newY)) {
-            neighbors.push({ x: newX, y: newY });
+            // Prevent cutting corners of obstacles
+            if (dir.dx !== 0 && dir.dy !== 0) { // It's a diagonal move
+                const isObstacleX = map.isColliding(x + dir.dx, y);
+                const isObstacleY = map.isColliding(x, y + dir.dy);
+                if (!isObstacleX && !isObstacleY) {
+                    neighbors.push({ x: newX, y: newY });
+                }
+            } else { // It's a cardinal move
+                neighbors.push({ x: newX, y: newY });
+            }
         }
     }
     return neighbors;
