@@ -223,6 +223,23 @@ body, html {
     gap: 10px;
 }
 
+.setting-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.setting-item label {
+    font-weight: normal !important; /* Override section label style */
+    cursor: pointer;
+}
+
+.setting-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
 .setting-desc {
     font-size: 14px;
     color: #aaa;

@@ -334,30 +334,32 @@ export class Game {
         this.map.renderBase(this.ctx, cameraX, cameraY, drawStartX, drawEndX, drawStartY, drawEndY);
 
         // --- Render Target Highlights ---
-        this.ctx.save();
-        this.ctx.lineWidth = 2;
-        this.ctx.shadowBlur = 8;
-        this.ctx.shadowColor = 'rgba(255, 255, 100, 0.8)';
-        const alpha = (Math.sin(performance.now() / 250) + 1) / 2 * 0.6 + 0.4; // Pulsates between 0.4 and 1.0
-        
-        for (const player of this.players.values()) {
-            if ((player.state === PLAYER_STATE.MOVING_TO_TREE || player.state === PLAYER_STATE.CHOPPING) && player.actionTarget) {
-                const targetX = player.actionTarget.x;
-                const targetY = player.actionTarget.y;
+        if (this.settings.visuals && this.settings.visuals.show_target_indicator) {
+            this.ctx.save();
+            this.ctx.lineWidth = 2;
+            this.ctx.shadowBlur = 8;
+            this.ctx.shadowColor = 'rgba(255, 255, 100, 0.8)';
+            const alpha = (Math.sin(performance.now() / 250) + 1) / 2 * 0.6 + 0.4; // Pulsates between 0.4 and 1.0
+            
+            for (const player of this.players.values()) {
+                if ((player.state === PLAYER_STATE.MOVING_TO_TREE || player.state === PLAYER_STATE.CHOPPING) && player.actionTarget) {
+                    const targetX = player.actionTarget.x;
+                    const targetY = player.actionTarget.y;
 
-                const screenX = Math.round(targetX * tileSize - cameraX);
-                const screenY = Math.round(targetY * tileSize - cameraY);
-                
-                // Check if the tile is on screen before drawing
-                if (screenX + tileSize > 0 && screenX < this.canvas.width &&
-                    screenY + tileSize > 0 && screenY < this.canvas.height) {
+                    const screenX = Math.round(targetX * tileSize - cameraX);
+                    const screenY = Math.round(targetY * tileSize - cameraY);
+                    
+                    // Check if the tile is on screen before drawing
+                    if (screenX + tileSize > 0 && screenX < this.canvas.width &&
+                        screenY + tileSize > 0 && screenY < this.canvas.height) {
 
-                    this.ctx.strokeStyle = `rgba(255, 255, 100, ${alpha})`;
-                    this.ctx.strokeRect(screenX + 1, screenY + 1, tileSize - 2, tileSize - 2);
+                        this.ctx.strokeStyle = `rgba(255, 255, 100, ${alpha})`;
+                        this.ctx.strokeRect(screenX + 1, screenY + 1, tileSize - 2, tileSize - 2);
+                    }
                 }
             }
+            this.ctx.restore();
         }
-        this.ctx.restore();
 
         // --- Y-Sorting Render Logic ---
         const renderList = [];

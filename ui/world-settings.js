@@ -81,6 +81,13 @@ export function showWorldSettings(channel, worldName) {
                     <p class="setting-desc">The game now uses IndexedDB for better performance and capacity.</p>
                     <div id="storage-info">Loading...</div>
                 </div>
+                <div class="settings-section">
+                    <label>Visuals</label>
+                    <div class="setting-item">
+                        <input type="checkbox" id="show_target_indicator" data-path="visuals.show_target_indicator" ${settings.visuals && settings.visuals.show_target_indicator ? 'checked' : ''}>
+                        <label for="show_target_indicator">Show Target Tile Indicator</label>
+                    </div>
+                </div>
             </div>
             <div class="settings-column">
                 <div class="settings-section">
@@ -236,6 +243,21 @@ export function showWorldSettings(channel, worldName) {
                 current = current[path[i]];
             }
             current[path[path.length - 1]] = Number(input.value);
+            saveSettings(channel, currentWorldName, settings);
+        });
+    });
+
+    DOM.worldSettingsContainer.querySelectorAll('input[type="checkbox"]').forEach(input => {
+        input.addEventListener('change', () => {
+            const path = input.dataset.path.split('.');
+            let current = settings;
+            for (let i = 0; i < path.length - 1; i++) {
+                if (!current[path[i]]) {
+                    current[path[i]] = {};
+                }
+                current = current[path[i]];
+            }
+            current[path[path.length - 1]] = input.checked;
             saveSettings(channel, currentWorldName, settings);
         });
     });

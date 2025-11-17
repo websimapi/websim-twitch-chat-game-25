@@ -17,6 +17,9 @@ export const DEFAULT_GAME_SETTINGS = {
         harvest_bushes_min_yield: 200,
         harvest_bushes_max_yield: 1000,
         harvest_bushes_xp: 1,
+    },
+    visuals: {
+        show_target_indicator: true,
     }
 };
 
