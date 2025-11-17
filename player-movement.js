@@ -81,6 +81,54 @@ export function updateMoveToTarget(player, deltaTime, gameMap) {
     }
 }
 
+export function applySeparation(player, allPlayers, gameMap) {
+    const separationRadius = (1 / 2.5) * 2; // Player diameter in grid units
+    const separationForce = 0.005; // A small push force to avoid being too jerky
+    let totalPushX = 0;
+    let totalPushY = 0;
+    let neighbors = 0;
+
+    for (const otherPlayer of allPlayers.values()) {
+        if (otherPlayer.id === player.id) continue;
+
+        const dx = player.pixelX - otherPlayer.pixelX;
+        const dy = player.pixelY - otherPlayer.pixelY;
+        const distanceSq = dx * dx + dy * dy;
+
+        // Only consider players that are actually overlapping or very close
+        if (distanceSq > 0 && distanceSq < separationRadius * separationRadius) {
+            const distance = Math.sqrt(distanceSq);
+            // The closer the players, the stronger the push
+            const pushFactor = (separationRadius - distance) / separationRadius;
+            totalPushX += (dx / distance) * pushFactor;
+            totalPushY += (dy / distance) * pushFactor;
+            neighbors++;
+        }
+    }
+
+    if (neighbors > 0) {
+        // Average the push vector and apply the force
+        const avgPushX = (totalPushX / neighbors) * separationForce;
+        const avgPushY = (totalPushY / neighbors) * separationForce;
+
+        const newPixelX = player.pixelX + avgPushX;
+        const newPixelY = player.pixelY + avgPushY;
+
+        // Check against map collision before applying the separation push
+        if (!gameMap.isPixelColliding(newPixelX, newPixelY)) {
+            player.pixelX = newPixelX;
+            player.pixelY = newPixelY;
+        } else {
+            // If pushing into a wall, try pushing only along one valid axis
+            if (!gameMap.isPixelColliding(newPixelX, player.pixelY)) {
+                player.pixelX = newPixelX;
+            } else if (!gameMap.isPixelColliding(player.pixelX, newPixelY)) {
+                player.pixelY = newPixelY;
+            }
+        }
+    }
+}
+
 export function pickNewTarget(player, gameMap) {
     let attempts = 0;
     let validTarget = false;

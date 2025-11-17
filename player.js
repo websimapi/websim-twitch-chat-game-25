@@ -9,6 +9,7 @@ import { beginChopping, beginHarvestingBushes, beginHarvestingLogs } from './beh
 import { PlayerEnergy } from './player-energy.js';
 import { PlayerInventory } from './player-inventory.js';
 import { PlayerSkills } from './player-skills.js';
+import { applySeparation } from './player-movement.js';
 
 export const ENERGY_DURATION_MS = 3600 * 1000; // This will now be controlled by settings
 
@@ -309,6 +310,9 @@ export class Player {
     update(deltaTime, gameMap, allPlayers, game) {
         const currentGridX = Math.round(this.pixelX);
         const currentGridY = Math.round(this.pixelY);
+        
+        // Apply separation from other players to prevent overlap
+        applySeparation(this, allPlayers, gameMap);
         
         if (gameMap.isColliding(currentGridX, currentGridY)) {
             console.warn(`[${this.username}] Detected player stuck in an obstacle at (${currentGridX}, ${currentGridY}). Moving to safety.`);
