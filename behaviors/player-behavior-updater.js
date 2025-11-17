@@ -80,6 +80,16 @@ export function updateAction(player, deltaTime, gameMap, allPlayers, game) {
                 const finalTargetY = player.actionTarget.y;
                 const currentSpotX = Math.round(player.pixelX);
                 const currentSpotY = Math.round(player.pixelY);
+
+                // If player is directly below the tree, don't do the final adjustment
+                // to avoid colliding with the tree trunk hitbox.
+                const isDirectlyBelow = currentSpotX === finalTargetX && currentSpotY === finalTargetY + 1;
+
+                if (isDirectlyBelow) {
+                    beginChopping(player, gameMap, game);
+                    return;
+                }
+
                 player.targetX = currentSpotX + (finalTargetX - currentSpotX) * 0.4;
                 player.targetY = currentSpotY + (finalTargetY - currentSpotY) * 0.4;
 
