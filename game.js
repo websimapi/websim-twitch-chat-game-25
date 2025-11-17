@@ -22,10 +22,6 @@ export class Game {
         console.log("Game started with hosts:", this.hosts);
         console.log("Game started with settings:", this.settings);
 
-        const { playersStorageKey, mapStorageKey } = Persistence.getStorageKeys(this.channel, this.worldName);
-        this.playersStorageKey = playersStorageKey;
-        this.mapStorageKey = mapStorageKey;
-
         this.players = new Map();
         this.map = new GameMap(32); // TileSize is 32
         this.camera = new Camera(this.canvas, this.map, this.players);
