@@ -1,6 +1,6 @@
 import { PLAYER_STATE } from '../player-state.js';
 import { findPath } from '../pathfinding.js';
-import { updateWander, updateFollowPath } from '../player-movement.js';
+import { updateWander, updateFollowPath, wanderNearTarget } from '../player-movement.js';
 import { startChoppingCycle } from './chopping.js';
 import { startGatheringCycle } from './gathering.js';
 import { TILE_TYPE } from '../map-tile-types.js';
@@ -106,7 +106,7 @@ export function updateFollow(player, gameMap, allPlayers, deltaTime) {
     } else if (GATHERING_STATES.includes(targetPlayer.state)) {
         startGatheringCycle(player, gameMap);
     } else {
-        // Target is idle or wandering, so follower also wanders
-        updateWander(player, deltaTime, gameMap);
+        // Target is idle or wandering, so follower also wanders, but near the target.
+        wanderNearTarget(player, targetPlayer, gameMap, deltaTime);
     }
 }
