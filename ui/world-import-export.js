@@ -1,5 +1,7 @@
 import { findWorldsForChannel, populateWorldList } from './world-list.js';
 import * as StorageManager from '../storage-manager.js';
+import * as idb from '../idb-helper.js';
+import { format } from '../data-format.js';
 
 const PLAYERS_STORAGE_PREFIX = 'twitch_game_players_';
 const MAP_STORAGE_PREFIX = 'twitch_game_map_';
@@ -36,7 +38,36 @@ function saveImportedWorld(channel, worldName, data) {
 }
 */
 
-function processImportedWorld(worldData) {
+async function saveImportedWorld(channel, worldName, data, dataFormat) {
+    let playersToSave = data.players || {};
+
+    // If format is verbose (or old format without a format key), compact it.
+    if (dataFormat !== 'compact') {
+        console.log("Imported world is in verbose or legacy format, compacting player data...");
+        const compactedPlayers = {};
+        for (const id in playersToSave) {
+            compactedPlayers[id] = format.compactPlayerData(playersToSave[id]);
+        }
+        playersToSave = compactedPlayers;
+    }
+
+    const worldKey = `${channel}/${worldName}`;
+    const worldState = {
+        players: playersToSave,
+        map: data.map || {}
+    };
+
+    try {
+        await idb.set('worlds', worldKey, worldState);
+        console.log(`Successfully imported and saved world "${worldName}" for channel "${channel}".`);
+        alert(`Successfully imported world: ${worldName}`);
+    } catch (e) {
+        alert('An error occurred while saving the imported world data to IndexedDB.');
+        console.error('Error saving imported world:', e);
+    }
+}
+
+async function processImportedWorld(worldData) {
     if (!worldData.worldName || !worldData.data || !worldData.data.players || !worldData.data.map) {
         alert('Invalid world file format.');
         return;
@@ -55,25 +86,24 @@ function processImportedWorld(worldData) {
         }
     }
 
-    const existingWorlds = findWorldsForChannel(channel);
+    const existingWorlds = await findWorldsForChannel(channel);
 
     if (existingWorlds.includes(importedWorldName)) {
-        const choice = prompt(`A world named \"${importedWorldName}\" already exists.\n\nType 'overwrite' to replace it.\nType 'copy' to save it as a new world.\n\nAnything else will cancel.`, 'copy');
+        const choice = prompt(`A world named "${importedWorldName}" already exists.\n\nType 'overwrite' to replace it.\nType 'copy' to save it as a new world.\n\nAnything else will cancel.`, 'copy');
 
         if (choice && choice.toLowerCase() === 'overwrite') {
             // Name remains the same, will overwrite existing data.
         } else if (choice && choice.toLowerCase() === 'copy') {
             importedWorldName = findAvailableWorldName(importedWorldName, existingWorlds);
-            alert(`The world will be imported as \"${importedWorldName}\".`);
+            alert(`The world will be imported as "${importedWorldName}".`);
         } else {
             alert('Import cancelled.');
             return; // User cancelled or entered invalid input
         }
     }
 
-    console.warn("World import logic may need updating for new data formats.");
-    // saveImportedWorld(channel, importedWorldName, worldData.data);
-    populateWorldList(channel);
+    await saveImportedWorld(channel, importedWorldName, worldData.data, worldData.format);
+    await populateWorldList(channel);
 }
 
 export function handleWorldImport() {
