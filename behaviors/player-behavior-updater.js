@@ -109,7 +109,13 @@ export function updateAction(player, deltaTime, gameMap, allPlayers, game) {
                 return;
             }
             updateFollowPath(player, deltaTime, gameMap);
-            if (atMoveTarget) {
+
+            const dxLogs = player.pixelX - (player.actionTarget.x + 0.5);
+            const dyLogs = player.pixelY - (player.actionTarget.y + 0.5);
+            const distSqLogs = dxLogs * dxLogs + dyLogs * dyLogs;
+            const interactionDistSqLogs = 1.2 * 1.2;
+
+            if (atMoveTarget || distSqLogs < interactionDistSqLogs) {
                 beginHarvestingLogs(player, gameMap, game);
             }
             break;
@@ -120,7 +126,13 @@ export function updateAction(player, deltaTime, gameMap, allPlayers, game) {
                 return;
             }
             updateFollowPath(player, deltaTime, gameMap);
-            if (atMoveTarget) {
+
+            const dxBushes = player.pixelX - (player.actionTarget.x + 0.5);
+            const dyBushes = player.pixelY - (player.actionTarget.y + 0.5);
+            const distSqBushes = dxBushes * dxBushes + dyBushes * dyBushes;
+            const interactionDistSqBushes = 1.2 * 1.2;
+
+            if (atMoveTarget || distSqBushes < interactionDistSqBushes) {
                 beginHarvestingBushes(player, gameMap, game);
             }
             break;
