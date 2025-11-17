@@ -84,11 +84,13 @@ function getNeighbors(x, y, map) {
         const newY = y + dir.dy;
 
         if (newX >= 0 && newX < map.width && newY >= 0 && newY < map.height && !map.isColliding(newX, newY)) {
-            // Prevent cutting corners of obstacles
+            // Allow diagonal movement even if one of the adjacent cardinal tiles is blocked.
+            // This allows "hugging" corners.
             if (dir.dx !== 0 && dir.dy !== 0) { // It's a diagonal move
                 const isObstacleX = map.isColliding(x + dir.dx, y);
                 const isObstacleY = map.isColliding(x, y + dir.dy);
-                if (!isObstacleX && !isObstacleY) {
+                // Only block diagonal if BOTH adjacent tiles that form the corner are obstacles.
+                if (!isObstacleX || !isObstacleY) {
                     neighbors.push({ x: newX, y: newY });
                 }
             } else { // It's a cardinal move
