@@ -50,44 +50,6 @@ export function updateFollowPath(player, deltaTime, gameMap) {
     }
 }
 
-export function wanderNearTarget(player, target, gameMap, deltaTime) {
-    if (player.path.length > 0) {
-        updateFollowPath(player, deltaTime, gameMap);
-        return;
-    }
-
-    player.moveCooldown -= deltaTime;
-    if (player.moveCooldown <= 0) {
-        player.moveCooldown = 4 + Math.random() * 4; // Wait 4-8 seconds before wandering again
-
-        const WANDER_RADIUS = 4;
-        const targetX = Math.round(target.pixelX);
-        const targetY = Math.round(target.pixelY);
-
-        let bestSpot = null;
-        let attempts = 0;
-
-        while (!bestSpot && attempts < 15) {
-            const angle = Math.random() * 2 * Math.PI;
-            const distance = Math.random() * WANDER_RADIUS;
-            const spotX = Math.round(targetX + Math.cos(angle) * distance);
-            const spotY = Math.round(targetY + Math.sin(angle) * distance);
-
-            if (spotX >= 0 && spotX < gameMap.width && spotY >= 0 && spotY < gameMap.height && !gameMap.isColliding(spotX, spotY)) {
-                const path = findPath(Math.round(player.pixelX), Math.round(player.pixelY), spotX, spotY, gameMap);
-                if (path) {
-                    bestSpot = path;
-                }
-            }
-            attempts++;
-        }
-        
-        if (bestSpot) {
-            player.path = bestSpot;
-        }
-    }
-}
-
 export function updateMoveToTarget(player, deltaTime, gameMap) {
     const dx = player.targetX - player.pixelX;
     const dy = player.targetY - player.pixelY;
@@ -160,3 +122,4 @@ export function pickNewTarget(player, gameMap) {
         player.targetY = player.pixelY;
     }
 }
+

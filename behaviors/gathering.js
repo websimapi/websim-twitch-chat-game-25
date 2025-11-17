@@ -3,15 +3,22 @@ import { TILE_TYPE } from '../map-tile-types.js';
 import { findPath } from '../pathfinding.js';
 import { startChoppingCycle } from './chopping.js';
 
-export function startGatheringCycle(player, gameMap) {
+export function startGatheringCycle(player, gameMap, searchCenter = null, searchRadius = null) {
     player.state = PLAYER_STATE.SEARCHING_FOR_GATHERABLE;
     console.log(`[${player.username}] Starting gathering cycle, searching for resources.`);
 
     const gatherableTypes = [TILE_TYPE.LOGS, TILE_TYPE.BUSHES];
-    const allGatherables = gameMap.findAll(gatherableTypes);
+    
+    let allGatherables;
+    if (searchCenter && searchRadius) {
+        console.log(`[${player.username}] Performing a localized gather search around (${searchCenter.pixelX.toFixed(1)}, ${searchCenter.pixelY.toFixed(1)}) with radius ${searchRadius}.`);
+        allGatherables = gameMap.findAllInRadius(searchCenter.pixelX, searchCenter.pixelY, gatherableTypes, searchRadius);
+    } else {
+        allGatherables = gameMap.findAll(gatherableTypes);
+    }
 
     if (allGatherables.length === 0) {
-        console.log(`[${player.username}] No gatherables found on the map. Wandering...`);
+        console.log(`[${player.username}] No gatherables found in search area. Wandering...`);
         player.state = PLAYER_STATE.WANDERING_TO_GATHER;
         player.lastSearchPosition = { x: player.pixelX, y: player.pixelY };
         return;

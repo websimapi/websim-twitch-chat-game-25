@@ -156,6 +156,31 @@ export class Map {
         return locations;
     }
 
+    findAllInRadius(x, y, tileTypes, radius) {
+        if (!Array.isArray(tileTypes)) tileTypes = [tileTypes];
+        const locations = [];
+
+        const startX = Math.max(0, Math.floor(x - radius));
+        const endX = Math.min(this.width - 1, Math.ceil(x + radius));
+        const startY = Math.max(0, Math.floor(y - radius));
+        const endY = Math.min(this.height - 1, Math.ceil(y + radius));
+        const radiusSq = radius * radius;
+
+        for (let j = startY; j <= endY; j++) {
+            for (let i = startX; i <= endX; i++) {
+                const tileType = this.grid[j][i];
+                if (tileTypes.includes(tileType)) {
+                    const dx = i - x;
+                    const dy = j - y;
+                    if (dx * dx + dy * dy <= radiusSq) {
+                        locations.push({ x: i, y: j, type: tileType });
+                    }
+                }
+            }
+        }
+        return locations;
+    }
+
     findNearest(x, y, tileType) {
         let nearest = null;
         let minDistance = Infinity;
