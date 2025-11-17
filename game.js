@@ -67,7 +67,6 @@ export class Game {
 
         this.resize();
         window.addEventListener('resize', () => this.resize());
-        window.addEventListener('keydown', (e) => this.handleKeyPress(e));
         
         this.saveInterval = setInterval(async () => {
             await StorageManager.saveGameState(this.channel, this.worldName, this.players, this.map);
