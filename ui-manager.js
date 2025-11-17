@@ -23,7 +23,9 @@ function showWorldSelect(channel) {
     populateWorldList(channel);
 }
 
-function setupEventListeners() {
+export function initUIManager(onStartGame) {
+    startGameCallback = onStartGame;
+
     DOM.connectBtn.addEventListener('click', () => {
         const channel = DOM.channelInput.value.trim().toLowerCase();
         if (channel) {
@@ -48,18 +50,6 @@ function setupEventListeners() {
             DOM.connectBtn.click();
         }
     });
-}
-
-
-export function initUIManager(onStartGame) {
-    startGameCallback = onStartGame;
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setupEventListeners);
-    } else {
-        setupEventListeners();
-    }
-
 
     // Load channel from localStorage on startup
     const savedChannel = localStorage.getItem(STORAGE_KEY);
@@ -67,4 +57,3 @@ export function initUIManager(onStartGame) {
         DOM.channelInput.value = savedChannel;
     }
 }
-

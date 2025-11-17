@@ -105,7 +105,16 @@ export function updateFollow(player, gameMap, allPlayers, deltaTime) {
         startChoppingCycle(player, gameMap);
     } else if (GATHERING_STATES.includes(targetPlayer.state)) {
         // Perform a localized search around the target player to avoid wandering off.
-        startGatheringCycle(player, gameMap, targetPlayer, 10);
+        const gatherables = gameMap.findAllInRadius(targetPlayer.pixelX, targetPlayer.pixelY, [TILE_TYPE.LOGS, TILE_TYPE.BUSHES], 10);
+        if (gatherables.length > 0) {
+            startGatheringCycle(player, gameMap, targetPlayer, 10);
+        } else if (WOODCUTTING_STATES.includes(targetPlayer.state) && targetPlayer.actionTarget) {
+            // Nothing to gather, but the target is still chopping. Let's help them.
+             console.log(`[${player.username}] Nothing to gather near ${targetPlayer.username}, switching to help chop.`);
+            startChoppingCycle(player, gameMap);
+        } else {
+             updateWander(player, deltaTime, gameMap);
+        }
     } else {
         // Target is idle or wandering, so follower also wanders
         updateWander(player, deltaTime, gameMap);
