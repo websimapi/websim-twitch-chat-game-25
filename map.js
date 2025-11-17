@@ -119,8 +119,27 @@ export class Map {
             return true; 
         }
         
-        // 1 means Tree/Obstacle
+        // 1 means Tree/Obstacle. For pathfinding, the whole tile is an obstacle.
         return this.grid[gridY][gridX] === TILE_TYPE.TREE;
+    }
+
+    isPixelColliding(pixelX, pixelY) {
+        const gridX = Math.floor(pixelX);
+        const gridY = Math.floor(pixelY);
+        const tileYOffset = pixelY - gridY;
+    
+        if (gridX < 0 || gridX >= this.width || gridY < 0 || gridY >= this.height) {
+            return true;
+        }
+    
+        const tileType = this.grid[gridY][gridX];
+    
+        if (tileType === TILE_TYPE.TREE) {
+            // Collision only on the bottom 40% of the tile (the trunk)
+            return tileYOffset > 0.6;
+        }
+    
+        return false; // Only trees have special collision for now
     }
 
     findAll(tileTypes) {
