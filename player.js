@@ -281,10 +281,10 @@ export class Player {
                     beginChopping(this, gameMap, game);
                 } else if (this.state === PLAYER_STATE.HARVESTING_LOGS) {
                     console.log(`[${this.username}] Re-initializing harvesting logs state on load.`);
-                    beginHarvestingLogs(this, gameMap);
+                    beginHarvestingLogs(this, gameMap, game);
                 } else if (this.state === PLAYER_STATE.HARVESTING_BUSHES) {
                     console.log(`[${this.username}] Re-initializing harvesting bushes state on load.`);
-                    beginHarvestingBushes(this, gameMap);
+                    beginHarvestingBushes(this, gameMap, game);
                 }
 
                 // Re-calculate paths for movement states
