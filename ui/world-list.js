@@ -52,13 +52,28 @@ export async function populateWorldList(channel) {
         const worldEl = document.createElement('div');
         worldEl.className = 'world-item';
         
-        // Player count display is tricky with IDB without loading all data. 
-        // For now, we'll omit it to keep things fast. A placeholder or async load could be added later.
+        // Player count will be updated asynchronously.
         worldEl.innerHTML = `
             <h3>${worldName}</h3>
-            <p>-- players</p> 
+            <p class="player-count">-- players</p> 
             <button class="export-btn">Export Data</button>
         `;
+
+        // Asynchronously fetch world data to get the player count.
+        const worldKey = `${channel}/${worldName}`;
+        idb.get('worlds', worldKey).then(worldData => {
+            const playerCount = worldData && worldData.players ? Object.keys(worldData.players).length : 0;
+            const playerCountEl = worldEl.querySelector('.player-count');
+            if (playerCountEl) {
+                playerCountEl.textContent = `${playerCount} player${playerCount !== 1 ? 's' : ''}`;
+            }
+        }).catch(err => {
+             console.error(`Failed to load player count for ${worldName}`, err);
+             const playerCountEl = worldEl.querySelector('.player-count');
+             if (playerCountEl) {
+                playerCountEl.textContent = `Error loading`;
+             }
+        });
 
         worldEl.addEventListener('click', (e) => {
             if (e.target.classList.contains('export-btn')) return;
