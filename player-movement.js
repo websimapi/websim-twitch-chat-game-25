@@ -58,18 +58,34 @@ export function updateMoveToTarget(player, deltaTime, gameMap) {
     if (dist > 0.01) {
         const moveAmount = player.speed * deltaTime;
         
-        const nextPixelX = player.pixelX + (dx / dist) * moveAmount;
-        const nextPixelY = player.pixelY + (dy / dist) * moveAmount;
+        const moveX = (dx / dist) * moveAmount;
+        const moveY = (dy / dist) * moveAmount;
+
+        const currentGridX = Math.round(player.pixelX);
+        const currentGridY = Math.round(player.pixelY);
+
+        const nextPixelX = player.pixelX + moveX;
+        const nextPixelY = player.pixelY + moveY;
         
         const nextGridX = Math.round(nextPixelX);
         const nextGridY = Math.round(nextPixelY);
-        
-        if (!gameMap.isColliding(nextGridX, nextGridY) || (nextGridX === player.targetX && nextGridY === player.targetY)) {
-            player.pixelX = nextPixelX;
-            player.pixelY = nextPixelY;
+
+        // Check X-axis collision
+        if (nextGridX !== currentGridX) { // Moving horizontally to a new tile
+            if (!gameMap.isColliding(nextGridX, currentGridY)) {
+                player.pixelX = nextPixelX;
+            }
         } else {
-            player.pixelX = Math.round(player.pixelX); // Snap to grid
-            player.pixelY = Math.round(player.pixelY);
+            player.pixelX = nextPixelX; // No new tile, safe to move
+        }
+        
+        // Check Y-axis collision
+        if (nextGridY !== currentGridY) { // Moving vertically to a new tile
+             if (!gameMap.isColliding(Math.round(player.pixelX), nextGridY)) { // Use updated pixelX for check
+                player.pixelY = nextPixelY;
+            }
+        } else {
+            player.pixelY = nextPixelY; // No new tile, safe to move
         }
     } else {
         player.pixelX = player.targetX;
