@@ -8,4 +8,3 @@ export const connectBtn = document.getElementById('connect-btn');
 export const createWorldBtn = document.getElementById('create-world-btn');
 export const importWorldBtn = document.getElementById('import-world-btn');
 export const worldSelectTitle = document.getElementById('world-select-title');
-
