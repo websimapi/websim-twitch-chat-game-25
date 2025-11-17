@@ -148,7 +148,7 @@ export function updateAction(player, deltaTime, gameMap, allPlayers, game) {
             }
             // The main logic for timer countdown is now handled centrally in game.js
             // This block now only handles the intermittent chopping sound effect.
-            if (Math.floor(player.actionTimer) % 2 === 0 && Math.floor(player.actionTimer + deltaTime) % 2 !== 0) {
+            if (Math.floor(player.actionTotalTime - player.actionTimer) % 2 === 0 && Math.floor(player.actionTotalTime - (player.actionTimer - deltaTime)) % 2 !== 0) {
                  const chopSound = AudioManager.getBuffer('./chop.mp3');
                  AudioManager.play(chopSound, player.pixelX, player.pixelY);
             }
