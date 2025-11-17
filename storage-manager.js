@@ -91,6 +91,12 @@ export async function loadGameState(channel, worldName) {
     return data || { players: {}, map: {} };
 }
 
+export async function deleteWorld(channel, worldName) {
+    const worldKey = `${channel}/${worldName}`;
+    await idb.del('worlds', worldKey);
+    console.log(`[StorageManager] Deleted world ${worldName} from IndexedDB.`);
+}
+
 export async function exportWorldData(channel, worldName, useVerbose) {
     const worldKey = `${channel}/${worldName}`;
     const worldState = await idb.get('worlds', worldKey);

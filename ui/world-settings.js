@@ -255,10 +255,10 @@ export function showWorldSettings(channel, worldName) {
     deleteWorldBtn.addEventListener('click', () => {
         if (deleteWorldBtn.disabled) return;
 
-        showDeleteConfirmation(() => {
+        showDeleteConfirmation(async () => {
             console.log(`Deleting world: ${currentWorldName}`);
             // This also needs to be updated for IDB.
-            StorageManager.del('worlds', `${channel}/${currentWorldName}`);
+            await StorageManager.deleteWorld(channel, currentWorldName);
 
             // Also remove settings and hosts from localStorage
             localStorage.removeItem(`twitch_game_settings_${channel}_${currentWorldName}`);
