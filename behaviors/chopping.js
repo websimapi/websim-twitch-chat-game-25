@@ -25,37 +25,41 @@ export function findAndMoveToTree(player, gameMap) {
     for (let i = 0; i < allTrees.length && i < MAX_TREES_TO_CHECK; i++) {
         const treeCoords = allTrees[i];
         
-        let bestSpot = null;
-        let minDistance = Infinity;
-        // Find best spot to stand next to the tree
+        let bestPath = null;
+        let minPathLength = Infinity;
+
+        // Find best path to an adjacent spot
         for(let dx = -1; dx <= 1; dx++) {
             for(let dy = -1; dy <= 1; dy++) {
                 if(dx === 0 && dy === 0) continue;
+
                 const spotX = treeCoords.x + dx;
                 const spotY = treeCoords.y + dy;
+
+                if (spotX < 0 || spotX >= gameMap.width || spotY < 0 || spotY >= gameMap.height) {
+                    continue;
+                }
+
                 if(!gameMap.isColliding(spotX, spotY)) {
-                    const dist = (spotX - player.pixelX)**2 + (spotY - player.pixelY)**2;
-                    if(dist < minDistance) {
-                       minDistance = dist;
-                       bestSpot = {x: spotX, y: spotY};
+                    const startX = Math.round(player.pixelX);
+                    const startY = Math.round(player.pixelY);
+                    const path = findPath(startX, startY, spotX, spotY, gameMap);
+
+                    if (path && path.length < minPathLength) {
+                        minPathLength = path.length;
+                        bestPath = path;
                     }
                 }
             }
         }
         
-        if(bestSpot) {
-           const startX = Math.round(player.pixelX);
-           const startY = Math.round(player.pixelY);
-           const path = findPath(startX, startY, bestSpot.x, bestSpot.y, gameMap);
-           
-           if (path) {
-               player.actionTarget = treeCoords;
-               player.path = path;
-               player.state = PLAYER_STATE.MOVING_TO_TREE;
-               console.log(`[${player.username}] Found pathable tree at (${treeCoords.x}, ${treeCoords.y}). Moving to chop.`);
-               pathFound = true;
-               break; // Exit the loop since we found a valid tree and path
-           }
+        if(bestPath) {
+           player.actionTarget = treeCoords;
+           player.path = bestPath;
+           player.state = PLAYER_STATE.MOVING_TO_TREE;
+           console.log(`[${player.username}] Found pathable tree at (${treeCoords.x}, ${treeCoords.y}). Moving to chop.`);
+           pathFound = true;
+           break; // Exit the loop since we found a valid tree and path
         }
     }
 
